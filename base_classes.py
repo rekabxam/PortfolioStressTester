@@ -12,13 +12,21 @@ class Holding():
     def pull_prices(self):
 
         self._stock = yf.Ticker(self._tkr)
-        self._hist = self._stock.history('max')['Close']
-        
-        return self._hist
+        self._hist = self._stock.history('max')
 
     def calc_returns(self):
-        pass
+        
+        self.pull_prices()
+        self._hist['Return'] = pd.NA
 
+        for _, d in enumerate(self._hist.index):
+            
+            if _ == 0:
+                pass
+
+            self._hist.loc[d, 'Return'] = round((self._hist['Close'].iloc[_] - self._hist['Close'].iloc[_-1])/self._hist['Close'].iloc[_-1], 3)
+        
+        return self._hist['Return']
 
 class Portfolio():
     pass
