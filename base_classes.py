@@ -24,12 +24,28 @@ class Holding():
             if _ == 0:
                 pass
 
-            self._hist.loc[d, 'Return'] = round((self._hist['Close'].iloc[_] - self._hist['Close'].iloc[_-1])/self._hist['Close'].iloc[_-1], 3)
+            self._hist.loc[d, 'Return'] = round((self._hist['Close'].iloc[_]
+                                                  - self._hist['Close'].iloc[_-1])
+                                                  /self._hist['Close'].iloc[_-1], 3)
         
         return self._hist['Return']
 
 class Portfolio():
-    pass
+    def __init__(self):
+
+        self._holdings = pd.DataFrame(data=[], columns=['Symbol', 'Category', 'Weighting'])
+    
+    def add_holding(self, info: list[str]):
+
+        self._holdings = pd.concat([self._holdings, pd.DataFrame(data=[info], 
+                                   columns=['Symbol', 'Category', 'Weighting'])])
+        
+
 
 class Simulation():
     pass
+
+port = Portfolio()
+port.add_holding(['CBA', 'EQ', '0.2'])
+port.add_holding(['CBA', 'EQ', '0.2'])
+print(port._holdings)
