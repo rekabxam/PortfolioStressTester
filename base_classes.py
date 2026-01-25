@@ -31,21 +31,29 @@ class Holding():
         return self._hist['Return']
 
 class Portfolio():
-    def __init__(self):
 
+    def __init__(self, value: int):
+
+        self._value = value
         self._holdings = pd.DataFrame(data=[], columns=['Symbol', 'Category', 'Weighting'])
+        self._holdings_added = 0
     
     def add_holding(self, info: list[str]):
 
         self._holdings = pd.concat([self._holdings, pd.DataFrame(data=[info], 
-                                   columns=['Symbol', 'Category', 'Weighting'])])
+                                   columns=['Symbol', 'Category', 'Weighting'],
+                                   index=[self._holdings_added])])
+        self._holdings.reindex(index=range(len(self._holdings)))
+        self._holdings_added += 1
+    
+    def calculate_returns(self):  # calculates return series of portfolio
         
+        self._prices = pd.DataFrame(data=[])
 
-
+    def calculate_specs(self):
+        pass
+        
 class Simulation():
     pass
 
-port = Portfolio()
-port.add_holding(['CBA', 'EQ', '0.2'])
-port.add_holding(['CBA', 'EQ', '0.2'])
-print(port._holdings)
+port = Portfolio(1)
