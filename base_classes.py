@@ -58,25 +58,18 @@ class Portfolio():
     def calculate_returns(self): 
         
         self.get_hist_dates()
-        self._prices = pd.DataFrame({"Date": self._dates, 
-                                     "Value": [0 for _ in  range(len(self._dates))]}).set_index("Date")
+        self._returns = pd.DataFrame({"Date": self._dates, 
+                                     "Return": [0 for _ in  range(len(self._dates))]}).set_index("Date")
 
         for _ in self._holdings.index:
-            
-            self._contrib = self._value * float(self._holdings.loc[_,'Weighting']) 
-            self._dummy_df = Holding(*self._holdings.loc[_,['Symbol', 'Category']]).calc_returns().loc[self._min_date:] 
+             
+            self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Category']])
 
-            for i,d in enumerate(self._dummy_df.index):
-                
-                if i != 0:
-                    try:
-                        self._contrib *= 1/(1+self._dummy_df.iloc[i])
-                    except RuntimeWarning:
-                        pass
-                
-                self._prices.loc[d, 'Value'] += self._contrib
-        
-        return self._prices
+            for i,r in enumerate(
+                self._holding.calc_returns().loc[self._min_date:]):
+
+                self._returns.iloc[i] += np.float64(
+                    self._holdings.loc[_, 'Weighting']) * r 
 
     def calculate_specs(self):
         pass
@@ -86,6 +79,6 @@ class Simulation():
 
 stock = Holding('XRO.AX', 'EQ')
 port = Portfolio(100)
-port.add_holding(['MIN.AX','','0.5'])
-port.add_holding(['PDI.AX','','0.5'])
-print(max(port.calculate_returns()['Value']))
+port.add_holding(['CBA.AX','','0.5'])
+port.add_holding(['XRO.AX','','0.5'])
+port.calculate_returns()
