@@ -70,7 +70,7 @@ class Portfolio():
                 
                 if i != 0:
                     try:
-                        self._contrib *= 1/self._dummy_df.iloc[i-1]
+                        self._contrib *= 1/(1+self._dummy_df.iloc[i])
                     except RuntimeWarning:
                         pass
                 
@@ -85,7 +85,7 @@ class Simulation():
     pass
 
 stock = Holding('XRO.AX', 'EQ')
-port = Portfolio(500000)
-port.add_holding(['CBA.AX','','0.2'])
-port.add_holding(['XRO.AX','','0.2'])
-print(port.calculate_returns())
+port = Portfolio(100)
+port.add_holding(['MIN.AX','','0.5'])
+port.add_holding(['PDI.AX','','0.5'])
+print(max(port.calculate_returns()['Value']))
