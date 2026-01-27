@@ -4,10 +4,11 @@ import yfinance as yf
 
 class Holding():
     
-    def __init__(self, ticker:  str, type: str):
+    def __init__(self, ticker:  str, type: str, wgt: int):
 
         self._tkr = yf.Ticker(ticker)
         self._type = type
+        self._wgt = wgt
         self._hist = self._tkr.history('max')
     
     def calc_returns(self):
@@ -25,6 +26,9 @@ class Holding():
     
     def get_min_date(self):
         return min(self._hist.index)
+
+    def get_weighting(self):
+        return self._wgt
 
 class Portfolio():
 
@@ -68,8 +72,7 @@ class Portfolio():
             for i,r in enumerate(
                 self._holding.calc_returns().loc[self._min_date:]):
 
-                self._returns.iloc[i] += np.float64(
-                    self._holdings.loc[_, 'Weighting']) * r 
+                self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r 
 
     def calculate_specs(self):
         pass
