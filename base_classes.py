@@ -49,7 +49,7 @@ class Portfolio():
     def get_hist_dates(self):
         
         for _ in self._holdings.index:
-            self._dummy = Holding(*(self._holdings.loc[_,['Symbol', 'Category']]))
+            self._dummy = Holding(*(self._holdings.loc[_,['Symbol', 'Category', 'Weighting']]))
 
             if _ == 0:
                 self._min_date = self._dummy.get_min_date()
@@ -63,11 +63,11 @@ class Portfolio():
         
         self.get_hist_dates()
         self._returns = pd.DataFrame({"Date": self._dates, 
-                                     "Return": [0 for _ in  range(len(self._dates))]}).set_index("Date")
+                                     "Return": [0 for _ in range(len(self._dates))]}).set_index("Date")
 
         for _ in self._holdings.index:
              
-            self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Category']])
+            self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Category', 'Weighting']])
 
             for i,r in enumerate(
                 self._holding.calc_returns().loc[self._min_date:]):
@@ -75,13 +75,14 @@ class Portfolio():
                 self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r 
 
     def calculate_specs(self):
-        pass
+        
+        self.calculate_returns()
+        return (np.mean(self._returns), np.std(self._returns))
         
 class Simulation():
     pass
 
-stock = Holding('XRO.AX', 'EQ')
 port = Portfolio(100)
 port.add_holding(['CBA.AX','','0.5'])
 port.add_holding(['XRO.AX','','0.5'])
-port.calculate_returns()
+print(port.calculate_specs())
