@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import pandas as pd
 import yfinance as yf
@@ -77,12 +78,43 @@ class Portfolio():
     def calculate_specs(self):
         
         self.calculate_returns()
-        return (np.mean(self._returns), np.std(self._returns))
-        
+
+        return (np.mean(self._returns['Return']), 
+                np.std(self._returns['Return']))
+    
+    def get_value(self):
+        return self._value
+
 class Simulation():
-    pass
+    
+    def __init__(self, portfolio: Portfolio, n_pth: int, n_sim: int):
+
+        self._port = portfolio
+        self._n_pth, self._n_sim = n_pth, n_sim
+
+    def calc_sim_price(self, price: float):
+        return price + (price * self._port.calculate_specs()[0] +
+                        self._port.calculate_specs()[1]*random.randint(-5,5))
+    
+    def gen_path(self):
+        
+        self._path = pd.DataFrame({"Sim Price": [self._port.get_value() for _ in range(self._n_pth)]},
+                                  index=range(self._n_pth))
+        
+        for _ in self._path.index:
+            if _ != 0:
+                self._path.loc[_] = self.calc_sim_price(self._path.loc[_-1])
+        
+        return self._path
+        
+    def gen_sim(self):
+        pass
+
+    def gen_summary(self):
+        pass
 
 port = Portfolio(100)
-port.add_holding(['CBA.AX','','0.5'])
-port.add_holding(['XRO.AX','','0.5'])
-print(port.calculate_specs())
+port.add_holding(['BHP.AX','','0.8'])
+port.add_holding(['IPX.AX','','0.2'])
+sim = Simulation(port, 20,1)
+print(sim.gen_path())
