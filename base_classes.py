@@ -78,9 +78,10 @@ class Portfolio():
     def calculate_specs(self):
         
         self.calculate_returns()
-
-        return (np.mean(self._returns['Return']), 
+        self._specs = (np.mean(self._returns['Return']), 
                 np.std(self._returns['Return']))
+
+        return self._specs
     
     def get_value(self):
         return self._value
