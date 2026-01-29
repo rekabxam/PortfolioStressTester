@@ -60,11 +60,11 @@ class Portfolio():
                 self._min_date = self._dummy.get_min_date()
                 self._dates = list(self._dummy.calc_returns().index)
 
-    def calculate_returns(self): 
+    def calculate_specs(self): 
         
         self.get_hist_dates()
         self._returns = pd.DataFrame({"Date": self._dates, 
-                                     "Return": [0 for _ in range(len(self._dates))]}).set_index("Date")
+                                     "Return": [np.float64(0) for _ in range(len(self._dates))]}).set_index("Date")
 
         for _ in self._holdings.index:
              
@@ -75,12 +75,10 @@ class Portfolio():
 
                 self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r 
 
-    def calculate_specs(self):
-        
-        self.calculate_returns()
         self._specs = (np.mean(self._returns['Return']), 
                 np.std(self._returns['Return']))
 
+    def get_specs(self):        
         return self._specs
     
     def get_value(self):
@@ -92,15 +90,16 @@ class Simulation():
 
         self._port = portfolio
         self._n_pth, self._n_sim = n_pth, n_sim
-
+ 
     def calc_sim_price(self, price: float):
-        return price + (price * self._port.calculate_specs()[0] +
-                        self._port.calculate_specs()[1]*random.randint(-5,5))
+        return price + ((price * self._port.get_specs()[0]) +
+                        (self._port.get_specs()[1]*random.random()))
     
     def gen_path(self):
         
-        self._path = pd.DataFrame({"Sim Price": [self._port.get_value() for _ in range(self._n_pth)]},
-                                  index=range(self._n_pth))
+        self._path = pd.DataFrame({"Sim Price": [self._port.get_value() for _ in range(self._n_pth+1)]},
+                                  index=range(self._n_pth+1))
+        self._port.calculate_specs()
         
         for _ in self._path.index:
             if _ != 0:
@@ -115,7 +114,6 @@ class Simulation():
         pass
 
 port = Portfolio(100)
-port.add_holding(['BHP.AX','','0.8'])
-port.add_holding(['IPX.AX','','0.2'])
-sim = Simulation(port, 20,1)
-print(sim.gen_path())
+port.add_holding(['BHP.AX','','0.5'])
+port.add_holding(['CBA.AX','','0.5'])
+sim = Simulation(port,20,1)
