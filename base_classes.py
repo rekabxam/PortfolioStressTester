@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import yfinance as yf
 
 class Holding():
@@ -89,19 +90,24 @@ class Portfolio():
 
 class Simulation():
     
-    def __init__(self, portfolio: Portfolio, n_pth: int, n_sim: int):
+    def __init__(self, portfolio: Portfolio, n_pth: int, 
+                 n_sim: int, conf: int, gen_plot: bool):
 
         self._port = portfolio
         self._n_pth, self._n_sim = n_pth, n_sim
+        self._conf = conf/100
+        self._gen_plot = gen_plot
         self._port.calculate_specs()
  
     def calc_sim_price(self, price: float):
-        return price * (1 + ((self._port.get_specs()[0] * 252**-0.5) +
-                        (self._port.get_specs()[1] * 252**-0.5 * np.random.standard_normal(1)))) #GBM 
+        return round(price * (1 + 
+                        ((self._port.get_specs()[0] * 252**-0.5) +
+                        (self._port.get_specs()[1] * 252**-0.5 * 
+                         np.random.standard_normal(1)))),3)
     
     def gen_path(self):
         
-        self._path = pd.DataFrame({"Sim Price": [self._port.get_value() for _ in range(self._n_pth+1)]},
+        self._path = pd.DataFrame({"Sim Price": [np.float64(self._port.get_value()) for _ in range(self._n_pth+1)]},
                                   index=range(self._n_pth+1))
         
         for _ in self._path.index:
@@ -111,15 +117,32 @@ class Simulation():
         return self._path
         
     def gen_sim(self):
-        pass
+        
+        self._finals = []
+
+        for _ in range(self._n_sim):
+            
+            self._cur_sim = self.gen_path()
+            self._finals.append(self._cur_sim.loc[self._n_pth, 'Sim Price'])
+            
+            plt.plot(self._cur_sim)
+        
+        self._finals.sort()
 
     def gen_summary(self):
-        pass
+
+        self.gen_sim()
+
+        if self._gen_plot:
+            plt.show()
+        
+        self._var = self._finals[round((1-self._conf)*self._n_sim)]
+        print(self._var)
 
 port = Portfolio(100)
 port.add_holding(['BHP.AX','','0.5'])
 port.add_holding(['CBA.AX','','0.5'])
-sim = Simulation(port,20,1)
-print(sim.gen_path())
+sim = Simulation(port,20,2000,80,True)
+sim.gen_summary()
 
 
