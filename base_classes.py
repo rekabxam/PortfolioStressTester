@@ -75,8 +75,11 @@ class Portfolio():
 
                 self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r 
 
-        self._specs = (np.mean(self._returns['Return']), 
-                np.std(self._returns['Return']))
+        self._mu = (1+np.mean(self._returns['Return']))**252 - 1
+        self._sd = (np.std(self._returns['Return']) * 252**0.5)
+
+        self._specs = (self._mu,
+                       self._sd)
 
     def get_specs(self):        
         return self._specs
@@ -90,16 +93,16 @@ class Simulation():
 
         self._port = portfolio
         self._n_pth, self._n_sim = n_pth, n_sim
+        self._port.calculate_specs()
  
     def calc_sim_price(self, price: float):
-        return price + ((price * self._port.get_specs()[0]) +
-                        (self._port.get_specs()[1]*random.random()))
+        return price * (1 + ((self._port.get_specs()[0] * 252**-0.5) +
+                        (self._port.get_specs()[1] * 252**-0.5 * np.random.standard_normal(1)))) #GBM 
     
     def gen_path(self):
         
         self._path = pd.DataFrame({"Sim Price": [self._port.get_value() for _ in range(self._n_pth+1)]},
                                   index=range(self._n_pth+1))
-        self._port.calculate_specs()
         
         for _ in self._path.index:
             if _ != 0:
@@ -117,3 +120,6 @@ port = Portfolio(100)
 port.add_holding(['BHP.AX','','0.5'])
 port.add_holding(['CBA.AX','','0.5'])
 sim = Simulation(port,20,1)
+print(sim.gen_path())
+
+
