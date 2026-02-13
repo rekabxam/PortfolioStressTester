@@ -99,7 +99,7 @@ class Simulation():
         self._gen_plot = gen_plot
         self._port.calculate_specs()
  
-    def calc_sim_price(self, price: float):
+    def calc_sim_price(self, price: float): #could use adjustment later
 
         return round(price * (1 + 
                         ((self._port.get_specs()[0] * 252**-0.5) +
@@ -138,8 +138,8 @@ class Simulation():
         if self._gen_plot:
             plt.show()
         
-        self._var = self._gains[round((1-self._conf)*self._n_sim)] 
-        print(self._var)
+        self._conftail = self._gains[:round((1-self._conf)*self._n_sim)] 
+        self._var, self._es = self._conftail[-1], np.average(self._conftail)
     
 port = Portfolio(100)
 port.add_holding(['BHP.AX','','0.5'])
