@@ -100,6 +100,7 @@ class Simulation():
         self._port.calculate_specs()
  
     def calc_sim_price(self, price: float):
+
         return round(price * (1 + 
                         ((self._port.get_specs()[0] * 252**-0.5) +
                         (self._port.get_specs()[1] * 252**-0.5 * 
@@ -118,16 +119,17 @@ class Simulation():
         
     def gen_sim(self):
         
-        self._finals = []
+        self._gains = []
 
         for _ in range(self._n_sim):
             
             self._cur_sim = self.gen_path()
-            self._finals.append(self._cur_sim.loc[self._n_pth, 'Sim Price'])
+            self._gains.append(self._cur_sim.loc[self._n_pth, 'Sim Price'] -
+                                self._port.get_value())
             
             plt.plot(self._cur_sim)
         
-        self._finals.sort()
+        self._gains.sort()
 
     def gen_summary(self):
 
@@ -136,13 +138,13 @@ class Simulation():
         if self._gen_plot:
             plt.show()
         
-        self._var = self._finals[round((1-self._conf)*self._n_sim)]
+        self._var = self._gains[round((1-self._conf)*self._n_sim)] 
         print(self._var)
-
+    
 port = Portfolio(100)
 port.add_holding(['BHP.AX','','0.5'])
 port.add_holding(['CBA.AX','','0.5'])
-sim = Simulation(port,20,2000,80,True)
+sim = Simulation(port,20,2000,80,False)
 sim.gen_summary()
 
 
