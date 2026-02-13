@@ -140,11 +140,4 @@ class Simulation():
         
         self._conftail = self._gains[:round((1-self._conf)*self._n_sim)] 
         self._var, self._es = self._conftail[-1], np.average(self._conftail)
-    
-port = Portfolio(100)
-port.add_holding(['BHP.AX','','0.5'])
-port.add_holding(['CBA.AX','','0.5'])
-sim = Simulation(port,20,2000,80,False)
-sim.gen_summary()
-
 
