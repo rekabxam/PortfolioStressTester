@@ -2,6 +2,9 @@ from base_classes import *
 
 # this file will contain the code to run the program
 
+class StressView():
+    pass
+
 class StressModel():
     pass
 
