@@ -12,14 +12,26 @@ class StressView():
     def __init__(self):
         self._messages = VIEW_MESSAGES
 
-    def welcome(self, input):
+    def welcome(self):
         
         for message in list(self._messages.values())[:3]:
             print(message)
+
+        self._prompt = input(VIEW_MESSAGES['MODE_PROMPT'])
+        
+        return self._prompt
           
 class StressModel():
-    pass
+    
+    def __init__(self):
+        pass #could save some time by initialising portfolio and sim objects initially
 
+    def check_mode_prompt(self, mode_input):
+
+        self._mode = mode_input
+        print(f'{self._mode}? A great choice!')
+        print('Thats all for now :)')
+        
 class StressTester():
     
     def __init__(self):    
@@ -29,7 +41,7 @@ class StressTester():
     def execute(self):
         # 1) section of code printing program execute message/design w/ input prompt from model that checks to determine what version to use (imnport/build)
 
-        self._view.welcome()
+        self._model.check_mode_prompt(self._view.welcome())
 
         # 2) section of code that executes method of model based on whether import/build was given
         # 3) section of code that prompts user for other specifications
