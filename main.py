@@ -1,9 +1,14 @@
 from base_classes import *
 
+MODE_NAMES = {
+    1: 'Custom Builder',
+    2: 'Import'
+}
+
 VIEW_MESSAGES = {
     'TITLE': '** Portfolio Stress Tester | Developed by Max Baker **',
     'WELCOME_MESSAGE1': 'Welcome to the Portfolio Stress Tester! This program is currently undergoing development. ',
-    'WELCOME_MESSAGE2': 'This program currently supports 2 modes: \n (1) Custom Builder: Build your own portfolio from scratch. \n (2) Import: Import an existing portfolio with a formatted excel file.',
+    'WELCOME_MESSAGE2': f'This program currently supports 2 modes: \n (1) Custom Builder: Build your own portfolio from scratch. \n (2) Import: Import an existing portfolio with a formatted excel file.',
     'MODE_PROMPT': 'Please enter the method by which you wish to evaluate your portfolio (1/2): '    
 }
 
@@ -11,26 +16,29 @@ class StressView():
 
     def __init__(self):
         self._messages = VIEW_MESSAGES
+        self._mode_desc = MODE_NAMES
 
     def welcome(self):
         
         for message in list(self._messages.values())[:3]:
             print(message)
 
-        self._prompt = input(VIEW_MESSAGES['MODE_PROMPT'])
+        self._mode = input(self._messages['MODE_PROMPT'])
+        print(f'You have chosen: ({self._mode}) {self._mode_desc[int(self._mode)]}') #could perhaps write description and prompt for confirmation? (for later consideration)
         
-        return self._prompt
+        return self._mode
           
 class StressModel():
     
     def __init__(self):
-        pass #could save some time by initialising portfolio and sim objects initially
+        
+        self._mode = None
+        #self._portfolio = Portfolio(0)
+        #self._sim = Simulation(self._portfolio, 0, 0, 0, 0) # may need methods of these to change attributes later
 
-    def check_mode_prompt(self, mode_input):
+    def confirm_mode(self, mode_input):
 
         self._mode = mode_input
-        print(f'{self._mode}? A great choice!')
-        print('Thats all for now :)')
         
 class StressTester():
     
@@ -39,9 +47,8 @@ class StressTester():
         self._view = StressView()
 
     def execute(self):
-        # 1) section of code printing program execute message/design w/ input prompt from model that checks to determine what version to use (imnport/build)
 
-        self._model.check_mode_prompt(self._view.welcome())
+        self._model.confirm_mode(self._view.welcome())
 
         # 2) section of code that executes method of model based on whether import/build was given
         # 3) section of code that prompts user for other specifications
