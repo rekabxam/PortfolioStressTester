@@ -87,6 +87,9 @@ class Portfolio():
     
     def get_value(self):
         return self._value
+    
+    def get_hold_no(self):
+        return self._holdings_added
 
 class Simulation():
     
