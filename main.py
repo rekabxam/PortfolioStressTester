@@ -8,9 +8,8 @@ class StressModel():
         self._mode = None
         self._portfolio = Portfolio(0)
 
-    def confirm_mode(self, mode_input):
-
-        self._mode = int(mode_input)
+    def set_mode(self, mode_input):
+        self._mode = mode_input
     
     def get_mode(self):
         return self._mode
@@ -21,6 +20,7 @@ class StressModel():
 class StressView():
 
     def __init__(self):
+        
         self._messages = VIEW_MESSAGES
         self._prompts = PROMPT_MESSAGES
         self._mode_desc = MODE_NAMES
@@ -30,26 +30,28 @@ class StressView():
         for message in list(self._messages.values())[:3]:
             print(message)
 
-        return input(self._prompts['MODE_PROMPT'])
-    
-    def execute_mode_view(self, model: StressModel):
+        self._viewmode = int(input(self._prompts['MODE_PROMPT']))
 
-        self._viewmode = model.get_mode()
+        return self._viewmode
+    
+    def execute_mode_open(self):
+        
         print(f'\nYou have chosen: ({self._viewmode}) {self._mode_desc[self._viewmode]} \n') #could perhaps write description and prompt for confirmation? (for later consideration)
         print(f'** {self._mode_desc[self._viewmode]} ** \n')
         print(f'Thank you for choosing the {self._mode_desc[self._viewmode]}! :D')
 
         print('\nCommands:')
-    
-        if self._viewmode == 1:    
-            self.mode1_view(model)
+
+        if self._viewmode == 1:
+            print(self._messages['MODE1_CMDS'])
         
-        elif self._viewmode == 2:
-            self.mode2_view()
+        else:
+            pass
     
     def mode1_view(self, model: StressModel):
         
         print(self._messages['MODE1_CMDS'])
+
         input(f'\nPlease enter holding number {model.get_hold_no()+1}: ')
 
     def mode2_view(self):
@@ -63,11 +65,14 @@ class StressTester():
 
     def execute(self):
 
-        self._model.confirm_mode(self._view.welcome())
+        self._model.set_mode(self._view.welcome())
 
-        # 2) section of code that executes method of model based on whether import/build was given
+        if self._model.get_mode() == 1:
+            
+            self._view.execute_mode_open()
 
-        self._view.execute_mode_view(self._model)
+            #while not self._model.halt_construction(): #some type of method returning true or false based off whether command 'D' has been entered in view
+            #    pass
 
         # 3) section of code that prompts user for other specifications
         # 4) section of code that generates simulation (instantiates object and runs gen_summary)
