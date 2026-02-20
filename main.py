@@ -1,21 +1,28 @@
 from base_classes import *
+from constants import *
 
-MODE_NAMES = {
-    1: 'Custom Builder',
-    2: 'Import'
-}
+class StressModel():
+    
+    def __init__(self):
+        
+        self._mode = None
+        self._portfolio = Portfolio(0)
 
-VIEW_MESSAGES = {
-    'TITLE': '** Portfolio Stress Tester | Developed by Max Baker **',
-    'WELCOME_MESSAGE1': 'Welcome to the Portfolio Stress Tester! This program is currently undergoing development. ',
-    'WELCOME_MESSAGE2': f'This program currently supports 2 modes: \n (1) Custom Builder: Build your own portfolio from scratch. \n (2) Import: Import an existing portfolio with a formatted excel file.',
-    'MODE_PROMPT': 'Please enter the method by which you wish to evaluate your portfolio (1/2): '    
-}
+    def confirm_mode(self, mode_input):
+
+        self._mode = int(mode_input)
+    
+    def get_mode(self):
+        return self._mode
+    
+    def get_hold_no(self):
+        return self._portfolio.get_hold_no()
 
 class StressView():
 
     def __init__(self):
         self._messages = VIEW_MESSAGES
+        self._prompts = PROMPT_MESSAGES
         self._mode_desc = MODE_NAMES
 
     def welcome(self):
@@ -23,23 +30,31 @@ class StressView():
         for message in list(self._messages.values())[:3]:
             print(message)
 
-        self._mode = input(self._messages['MODE_PROMPT'])
-        print(f'You have chosen: ({self._mode}) {self._mode_desc[int(self._mode)]}') #could perhaps write description and prompt for confirmation? (for later consideration)
-        
-        return self._mode
-          
-class StressModel():
+        return input(self._prompts['MODE_PROMPT'])
     
-    def __init__(self):
-        
-        self._mode = None
-        #self._portfolio = Portfolio(0)
-        #self._sim = Simulation(self._portfolio, 0, 0, 0, 0) # may need methods of these to change attributes later
+    def execute_mode_view(self, model: StressModel):
 
-    def confirm_mode(self, mode_input):
+        self._viewmode = model.get_mode()
+        print(f'\nYou have chosen: ({self._viewmode}) {self._mode_desc[self._viewmode]} \n') #could perhaps write description and prompt for confirmation? (for later consideration)
+        print(f'** {self._mode_desc[self._viewmode]} ** \n')
+        print(f'Thank you for choosing the {self._mode_desc[self._viewmode]}! :D')
 
-        self._mode = mode_input
+        print('\nCommands:')
+    
+        if self._viewmode == 1:    
+            self.mode1_view(model)
         
+        elif self._viewmode == 2:
+            self.mode2_view()
+    
+    def mode1_view(self, model: StressModel):
+        
+        print(self._messages['MODE1_CMDS'])
+        input(f'\nPlease enter holding number {model.get_hold_no()+1}: ')
+
+    def mode2_view(self):
+        pass
+
 class StressTester():
     
     def __init__(self):    
@@ -51,6 +66,9 @@ class StressTester():
         self._model.confirm_mode(self._view.welcome())
 
         # 2) section of code that executes method of model based on whether import/build was given
+
+        self._view.execute_mode_view(self._model)
+
         # 3) section of code that prompts user for other specifications
         # 4) section of code that generates simulation (instantiates object and runs gen_summary)
         # 5) section of code that prompts whether user wants to 
