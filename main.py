@@ -45,8 +45,8 @@ class StressView():
         if self._viewmode == 1:
             print(self._messages['MODE1_CMDS'])
         
-        else:
-            pass
+        elif self._viewmode == 2:
+            print(self._messages['MODE2_CMDS'])
     
     def mode1_view(self, model: StressModel):
         
@@ -66,14 +66,12 @@ class StressTester():
     def execute(self):
 
         self._model.set_mode(self._view.welcome())
-
-        if self._model.get_mode() == 1:
             
-            self._view.execute_mode_open()
+        self._view.execute_mode_open()
+
 
             #while not self._model.halt_construction(): #some type of method returning true or false based off whether command 'D' has been entered in view
             #    pass
-
         # 3) section of code that prompts user for other specifications
         # 4) section of code that generates simulation (instantiates object and runs gen_summary)
         # 5) section of code that prompts whether user wants to 
