@@ -7,6 +7,28 @@ class StressModel():
         
         self._mode = None
         self._portfolio = Portfolio(0)
+        self._cmd = None
+
+    def receive_input(self, input):
+
+        self._cmd = input
+
+    def check_input(self):
+
+        if self._cmd == 'C':
+            pass
+        
+        elif self._cmd == 'D':
+            pass
+
+        elif self._cmd == 'R':
+            pass
+
+        elif self._cmd == 'H':
+            pass
+
+        else:
+            pass
 
     def set_mode(self, mode_input):
         self._mode = mode_input
@@ -15,7 +37,10 @@ class StressModel():
         return self._mode
     
     def get_hold_no(self):
-        return self._portfolio.get_hold_no()
+        return str(self._portfolio.get_hold_no())
+
+    def get_cmd(self):
+        return self._cmd
 
 class StressView():
 
@@ -48,14 +73,26 @@ class StressView():
         elif self._viewmode == 2:
             print(self._messages['MODE2_CMDS'])
     
-    def mode1_view(self, model: StressModel):
+    def mode_1_prompt(self, hold_no: int):
+
+        return input(self._prompts['CB_PROMPT'].replace('@', hold_no))
+    
+    def mode_1_receive(self, cmd: str):
+
+        if cmd == 'C':
+            pass
         
-        print(self._messages['MODE1_CMDS'])
+        elif cmd == 'D':
+            pass
 
-        input(f'\nPlease enter holding number {model.get_hold_no()+1}: ')
+        elif cmd == 'R':
+            pass
 
-    def mode2_view(self):
-        pass
+        elif cmd == 'H':
+            pass
+
+        else:
+            pass
 
 class StressTester():
     
@@ -65,13 +102,24 @@ class StressTester():
 
     def execute(self):
 
-        self._model.set_mode(self._view.welcome())
-            
+        self._model.set_mode(self._view.welcome())    
         self._view.execute_mode_open()
 
+        if self._model.get_mode() == 1:
 
-            #while not self._model.halt_construction(): #some type of method returning true or false based off whether command 'D' has been entered in view
-            #    pass
+            while self._model.get_cmd() != 'D':
+                
+                self._model.receive_input(
+                    self._view.mode_1_prompt(self._model.get_hold_no()))
+                
+                self._view.mode_1_receive(
+                    self._model.check_input()
+                )
+        
+        elif self._model.get_mode() == 2:
+
+            pass
+
         # 3) section of code that prompts user for other specifications
         # 4) section of code that generates simulation (instantiates object and runs gen_summary)
         # 5) section of code that prompts whether user wants to 

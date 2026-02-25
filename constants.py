@@ -6,7 +6,7 @@ MODE_NAMES = {
 
 PROMPT_MESSAGES = {
     'MODE_PROMPT': '\nPlease enter the method by which you wish to evaluate your portfolio (1/2): ',
-    'CB_PROMPT' : 'Please enter holding number @ (Format: ticker-weighting) or enter a valid command: '
+    'CB_PROMPT' : 'Please enter holding number @ (Format: ticker-type-weighting) or enter a valid command: '
 }
 
 VIEW_MESSAGES = {
@@ -14,6 +14,6 @@ VIEW_MESSAGES = {
     'WELCOME_MESSAGE1': '\nWelcome to the Portfolio Stress Tester! \nThis program is currently undergoing development.',
     'WELCOME_MESSAGE2': f'\nThis program currently supports 2 modes: \n (1) Custom Portfolio Builder: Build your own portfolio from scratch. \n (2) Portfolio CSV Importer: Import an existing portfolio with a formatted excel file.',
     'MODE1_CMDS': (' C: See current holdings \n D: Finish custom portfolio building ') + 
-    ('\n R: Reset current portfolio \n H: Help on commands and mode usage'),
+    ('\n R: Reset current portfolio \n H: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'NOTHING HERE YET'
 }
