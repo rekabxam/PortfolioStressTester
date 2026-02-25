@@ -9,26 +9,30 @@ class StressModel():
         self._portfolio = Portfolio(0)
         self._cmd = None
 
-    def receive_input(self, input):
+    def receive_input(self, input: str):
 
         self._cmd = input
 
     def check_input(self):
 
         if self._cmd == 'C':
-            pass
+             return self._portfolio.get_holdings()
         
-        elif self._cmd == 'D':
-            pass
+        elif self._cmd == 'R': 
+            self._portfolio.reset_holdings()
 
-        elif self._cmd == 'R':
-            pass
+        elif self._cmd == 'H': 
+            return
 
-        elif self._cmd == 'H':
-            pass
+        else: 
 
-        else:
-            pass
+            try:
+                Holding(*tuple(self._cmd.split('-'))) 
+            
+            except:
+                return 'Error Occurred'    
+                
+            self._portfolio.add_holding(tuple(self._cmd.split('-')))
 
     def set_mode(self, mode_input):
         self._mode = mode_input
@@ -37,7 +41,7 @@ class StressModel():
         return self._mode
     
     def get_hold_no(self):
-        return str(self._portfolio.get_hold_no())
+        return str(self._portfolio.get_hold_no() + 1)
 
     def get_cmd(self):
         return self._cmd
@@ -61,7 +65,7 @@ class StressView():
     
     def execute_mode_open(self):
         
-        print(f'\nYou have chosen: ({self._viewmode}) {self._mode_desc[self._viewmode]} \n') #could perhaps write description and prompt for confirmation? (for later consideration)
+        print(f'\nYou have chosen: ({self._viewmode}) {self._mode_desc[self._viewmode]} \n') 
         print(f'** {self._mode_desc[self._viewmode]} ** \n')
         print(f'Thank you for choosing the {self._mode_desc[self._viewmode]}! :D')
 
@@ -77,19 +81,19 @@ class StressView():
 
         return input(self._prompts['CB_PROMPT'].replace('@', hold_no))
     
-    def mode_1_receive(self, cmd: str):
+    def mode_1_receive(self, model_msg, cmd: str):
+
+        #if model_msg == 'Error Occurred': #need diff way of returning error
+        #    print(self._messages['ERR_ADDING']) 
 
         if cmd == 'C':
-            pass
+            print(model_msg)
         
-        elif cmd == 'D':
-            pass
-
         elif cmd == 'R':
-            pass
+            print(self._messages['PORT_RESET'])
 
         elif cmd == 'H':
-            pass
+            print(self._messages['MODE1_CMDS'])
 
         else:
             pass
@@ -113,14 +117,13 @@ class StressTester():
                     self._view.mode_1_prompt(self._model.get_hold_no()))
                 
                 self._view.mode_1_receive(
-                    self._model.check_input()
-                )
+                    self._model.check_input(), self._model.get_cmd())
         
         elif self._model.get_mode() == 2:
-
             pass
 
         # 3) section of code that prompts user for other specifications
+        
         # 4) section of code that generates simulation (instantiates object and runs gen_summary)
         # 5) section of code that prompts whether user wants to 
         # 6) section of code printing ending message from view class

@@ -15,5 +15,7 @@ VIEW_MESSAGES = {
     'WELCOME_MESSAGE2': f'\nThis program currently supports 2 modes: \n (1) Custom Portfolio Builder: Build your own portfolio from scratch. \n (2) Portfolio CSV Importer: Import an existing portfolio with a formatted excel file.',
     'MODE1_CMDS': (' C: See current holdings \n D: Finish custom portfolio building ') + 
     ('\n R: Reset current portfolio \n H: Help on commands and mode usage \n'),
-    'MODE2_CMDS': 'NOTHING HERE YET'
+    'MODE2_CMDS': 'NOTHING HERE YET',
+    'ERR_ADDING': 'An error was encountered while adding this holding. Please check ticker is correct and try again. ',
+    'PORT_RESET': '\n Portfolio holdings have been reset! \n'
 }
