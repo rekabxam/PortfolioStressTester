@@ -82,11 +82,20 @@ class Portfolio():
         self._specs = (self._mu,
                        self._sd)
 
+    def reset_holdings(self):
+        self._holdings.drop(self._holdings.index, inplace=True) 
+    
     def get_specs(self):        
         return self._specs
     
     def get_value(self):
         return self._value
+    
+    def get_hold_no(self):
+        return self._holdings_added
+
+    def get_holdings(self):
+        return self._holdings
 
 class Simulation():
     
