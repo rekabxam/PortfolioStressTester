@@ -149,3 +149,7 @@ class Simulation():
         
         self._conftail = self._gains[:round((1-self._conf)*self._n_sim)] 
         self._var, self._es = self._conftail[-1], np.average(self._conftail)
+    
+    def get_summary(self):
+
+        return [self._var, self._es]

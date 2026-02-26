@@ -34,6 +34,23 @@ class StressModel():
                 
             self._portfolio.add_holding(tuple(self._cmd.split('-')))
 
+    def read_sim_prompts(self, sim_specs: list):
+        
+        if sim_specs[-1] == 'Y':
+            sim_specs[-1] = True
+        
+        else:
+            sim_specs[-1] = False
+
+        self._sim_specs = tuple(sim_specs)
+        self._sim = Simulation(self._portfolio, *self._sim_specs)
+    
+    def generate_sim_summary(self):
+
+        self._sim.gen_sim()
+
+        return self._sim.get_summary()
+    
     def set_mode(self, mode_input):
         self._mode = mode_input
     
@@ -97,6 +114,17 @@ class StressView():
 
         else:
             pass
+    
+    def execute_sim_prompts(self):
+
+        self._spec_inputs = []
+        
+        for _ in list(self._prompts.keys())[2:]:
+            self._spec_inputs.extend(input(self._prompts[_]))
+
+        print('\nGenerating simulation. Please wait a moment...')
+        
+        return self._spec_inputs
 
 class StressTester():
     
@@ -122,8 +150,9 @@ class StressTester():
         elif self._model.get_mode() == 2:
             pass
 
-        # 3) section of code that prompts user for other specifications
-        # 4) section of code that generates simulation (instantiates object and runs gen_summary)
+        self._model.read_sim_prompts(self._view.execute_sim_prompts())
+
+        # section of code printing summary statistics
         # 5) section of code that prompts whether user wants to 
         # 6) section of code printing ending message from view class
         pass
