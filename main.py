@@ -123,7 +123,6 @@ class StressTester():
             pass
 
         # 3) section of code that prompts user for other specifications
-        
         # 4) section of code that generates simulation (instantiates object and runs gen_summary)
         # 5) section of code that prompts whether user wants to 
         # 6) section of code printing ending message from view class
