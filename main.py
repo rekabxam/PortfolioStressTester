@@ -36,14 +36,17 @@ class StressModel():
 
     def read_sim_prompts(self, sim_specs: list):
         
+        self._portfolio.set_value(sim_specs[0])
+
         if sim_specs[-1] == 'Y':
             sim_specs[-1] = True
         
         else:
             sim_specs[-1] = False
 
-        self._sim_specs = tuple(sim_specs)
-        print(sim_specs)
+        self._sim_specs = tuple(sim_specs[1:])
+        
+        print(self._sim_specs)
         self._sim = Simulation(self._portfolio, *self._sim_specs)
     
     def generate_sim_summary(self):
@@ -87,7 +90,7 @@ class StressView():
     def execute_mode_open(self):
         
         print(f'\nYou have chosen: ({self._viewmode}) {self._mode_desc[self._viewmode]} \n') 
-        print(f'** {self._mode_desc[self._viewmode]} ** \n')
+        print(f'** {self._mode_desc[self._viewmode]} ** \n') #perhaps put these into constants strings collection
         print(f'Thank you for choosing the {self._mode_desc[self._viewmode]}! :D')
 
         print('\nCommands:')

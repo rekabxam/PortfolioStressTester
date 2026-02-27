@@ -82,6 +82,9 @@ class Portfolio():
         self._specs = (self._mu,
                        self._sd)
 
+    def set_value(self, value: int):
+        self._value = value
+    
     def reset_holdings(self):
         self._holdings.drop(self._holdings.index, inplace=True) 
     

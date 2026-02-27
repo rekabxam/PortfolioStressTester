@@ -7,6 +7,7 @@ MODE_NAMES = {
 PROMPT_MESSAGES = {
     'MODE_PROMPT': '\nPlease enter the method by which you wish to evaluate your portfolio (1/2): ',
     'CB_PROMPT' : 'Please enter holding number @ (Format: ticker-type-weighting) or enter a valid command: ',
+    'PORT_VAL_PROMPT': 'Please enter the value of the entered portfolio: ',
     'NSTEP_PROMPT': 'Please enter how many steps you would like to simulate for your portfolio: ',
     'NSIM_PROMPT': 'Please enter how many simulations you would like to generate: ',
     'CONF_PROMPT': 'Please enter the confidence level (%) for which you are stress testing: ',
