@@ -21,5 +21,7 @@ VIEW_MESSAGES = {
     ('\n R: Reset current portfolio \n H: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'NOTHING HERE YET',
     'ERR_ADDING': 'An error was encountered while adding this holding. Please check ticker is correct and try again. ',
-    'PORT_RESET': '\n Portfolio holdings have been reset! \n'
+    'PORT_RESET': '\n Portfolio holdings have been reset! \n',
+    'SUMMARY_1': 'With a confidence level of X%, the simulation has generated the following statistics:\n',
+    'SUMMARY_2': 'Value-at-Risk: V \nExpected Shortfall: E'
 }

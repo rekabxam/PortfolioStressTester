@@ -43,6 +43,7 @@ class StressModel():
             sim_specs[-1] = False
 
         self._sim_specs = tuple(sim_specs)
+        print(sim_specs)
         self._sim = Simulation(self._portfolio, *self._sim_specs)
     
     def generate_sim_summary(self):
@@ -50,6 +51,9 @@ class StressModel():
         self._sim.gen_sim()
 
         return self._sim.get_summary()
+    
+    def get_sim(self):
+        return self._sim
     
     def set_mode(self, mode_input):
         self._mode = mode_input
@@ -120,11 +124,17 @@ class StressView():
         self._spec_inputs = []
         
         for _ in list(self._prompts.keys())[2:]:
-            self._spec_inputs.extend(input(self._prompts[_]))
+            self._spec_inputs.append(input(self._prompts[_]))
 
         print('\nGenerating simulation. Please wait a moment...')
         
         return self._spec_inputs
+    
+    def show_gen_summary(self, conf: int, sum_stats: tuple):
+
+        print(self._messages['SUMMARY_1'].replace('X', str(conf)))
+        print(self._messages['SUMMARY_2'].replace(
+            'V', str(sum_stats[0])).replace('E', str(sum_stats[1])))        
 
 class StressTester():
     
@@ -152,8 +162,10 @@ class StressTester():
 
         self._model.read_sim_prompts(self._view.execute_sim_prompts())
 
-        # section of code printing summary statistics
-        # 5) section of code that prompts whether user wants to 
+        self._view.show_gen_summary(self._model.get_sim().get_conf(),
+                                    self._model.generate_sim_summary())
+        
+        # 5) section of code that prompts whether user wants to evaluate another portfolio or end program
         # 6) section of code printing ending message from view class
         pass
 

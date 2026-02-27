@@ -151,5 +151,7 @@ class Simulation():
         self._var, self._es = self._conftail[-1], np.average(self._conftail)
     
     def get_summary(self):
-
         return [self._var, self._es]
+
+    def get_conf(self):
+        return self._conf
