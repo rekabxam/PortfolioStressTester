@@ -11,7 +11,8 @@ PROMPT_MESSAGES = {
     'NSTEP_PROMPT': 'Please enter how many steps you would like to simulate for your portfolio: ',
     'NSIM_PROMPT': 'Please enter how many simulations you would like to generate: ',
     'CONF_PROMPT': 'Please enter the confidence level (%) for which you are stress testing: ',
-    'GRAPH_PROMPT' : 'Please enter whether you would like to generate a graph for the simulation (Y/N): '
+    'GRAPH_PROMPT' : 'Please enter whether you would like to generate a graph for the simulation (Y/N): ',
+    'REPEAT_PROMPT': 'Would you like to evaluate another portfolio? (Y/N) '
 }
 
 VIEW_MESSAGES = {
@@ -24,5 +25,6 @@ VIEW_MESSAGES = {
     'ERR_ADDING': 'An error was encountered while adding this holding. Please check ticker is correct and try again. ',
     'PORT_RESET': '\n Portfolio holdings have been reset! \n',
     'SUMMARY_1': 'With a confidence level of X%, the simulation has generated the following statistics:\n',
-    'SUMMARY_2': 'Value-at-Risk: V \nExpected Shortfall: E'
+    'SUMMARY_2': 'Value-at-Risk: V \nExpected Shortfall: E',
+    'EXIT_PROMPT' : 'Thank you so much for using the Portfolio Stress Tester! :D \nSee you next time!'
 }

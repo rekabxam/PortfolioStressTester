@@ -5,6 +5,7 @@ class StressModel():
     
     def __init__(self):
         
+        self._execute = True
         self._mode = None
         self._portfolio = Portfolio(0)
         self._cmd = None
@@ -54,6 +55,14 @@ class StressModel():
         self._sim.gen_sim()
 
         return self._sim.get_summary()
+    
+    def set_execute(self, exec_input: str):
+
+        if exec_input == 'N':
+            self._execute = False
+    
+    def check_execute(self):
+        return self._execute
     
     def get_sim(self):
         return self._sim
@@ -137,7 +146,15 @@ class StressView():
 
         print(self._messages['SUMMARY_1'].replace('X', str(conf)))
         print(self._messages['SUMMARY_2'].replace(
-            'V', str(sum_stats[0])).replace('E', str(sum_stats[1])))        
+            'V', str(sum_stats[0])).replace('E', str(sum_stats[1])))
+
+    def check_reprompt(self):
+
+        return input(self._prompts['REPEAT_PROMPT'])
+    
+    def execute_exit_msg(self):
+
+        print(self._messages['EXIT_PROMPT'])
 
 class StressTester():
     
@@ -146,32 +163,34 @@ class StressTester():
         self._view = StressView()
 
     def execute(self):
+ 
+        while self._model.check_execute():
 
-        self._model.set_mode(self._view.welcome())    
-        self._view.execute_mode_open()
+            self._model.set_mode(self._view.welcome())    # may need to change this, won't need title welcome if redoing
+            self._view.execute_mode_open()
 
-        if self._model.get_mode() == 1:
+            if self._model.get_mode() == 1:
 
-            while self._model.get_cmd() != 'D':
-                
-                self._model.receive_input(
-                    self._view.mode_1_prompt(self._model.get_hold_no()))
-                
-                self._view.mode_1_receive(
-                    self._model.check_input(), self._model.get_cmd())
+                while self._model.get_cmd() != 'D':
+                    
+                    self._model.receive_input(
+                        self._view.mode_1_prompt(self._model.get_hold_no()))
+                    
+                    self._view.mode_1_receive(
+                        self._model.check_input(), self._model.get_cmd())
+            
+            elif self._model.get_mode() == 2:
+                pass
+
+            self._model.read_sim_prompts(self._view.execute_sim_prompts())
+
+            self._view.show_gen_summary(self._model.get_sim().get_conf(),
+                                        self._model.generate_sim_summary())
+            
+            self._model.set_execute(self, self._view.check_reprompt())
         
-        elif self._model.get_mode() == 2:
-            pass
-
-        self._model.read_sim_prompts(self._view.execute_sim_prompts())
-
-        self._view.show_gen_summary(self._model.get_sim().get_conf(),
-                                    self._model.generate_sim_summary())
-        
-        # 5) section of code that prompts whether user wants to evaluate another portfolio or end program
-        # 6) section of code printing ending message from view class
-        pass
-
+        self._view.execute_exit_msg()
+    
 def main():   
     controller = StressTester()
     controller.execute()
