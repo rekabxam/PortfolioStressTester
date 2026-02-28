@@ -46,8 +46,7 @@ class StressModel():
             sim_specs[-1] = False
 
         self._sim_specs = tuple(sim_specs[1:])
-        
-        print(self._sim_specs)
+    
         self._sim = Simulation(self._portfolio, *self._sim_specs)
     
     def generate_sim_summary(self):
@@ -136,7 +135,8 @@ class StressView():
         self._spec_inputs = []
         
         for _ in list(self._prompts.keys())[2:]:
-            self._spec_inputs.append(input(self._prompts[_]))
+            if _ != 'REPEAT_PROMPT':
+                self._spec_inputs.append(input(self._prompts[_]))
 
         print('\nGenerating simulation. Please wait a moment...')
         
