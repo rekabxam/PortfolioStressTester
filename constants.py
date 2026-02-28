@@ -6,7 +6,13 @@ MODE_NAMES = {
 
 PROMPT_MESSAGES = {
     'MODE_PROMPT': '\nPlease enter the method by which you wish to evaluate your portfolio (1/2): ',
-    'CB_PROMPT' : 'Please enter holding number @ (Format: ticker-type-weighting) or enter a valid command: '
+    'CB_PROMPT' : 'Please enter holding number @ (Format: ticker-type-weighting) or enter a valid command: ',
+    'PORT_VAL_PROMPT': 'Please enter the value of the entered portfolio: ',
+    'NSTEP_PROMPT': 'Please enter how many steps you would like to simulate for your portfolio: ',
+    'NSIM_PROMPT': 'Please enter how many simulations you would like to generate: ',
+    'CONF_PROMPT': 'Please enter the confidence level (%) for which you are stress testing: ',
+    'GRAPH_PROMPT' : 'Please enter whether you would like to generate a graph for the simulation (Y/N): ',
+    'REPEAT_PROMPT': 'Would you like to evaluate another portfolio? (Y/N) '
 }
 
 VIEW_MESSAGES = {
@@ -17,5 +23,8 @@ VIEW_MESSAGES = {
     ('\n R: Reset current portfolio \n H: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'NOTHING HERE YET',
     'ERR_ADDING': 'An error was encountered while adding this holding. Please check ticker is correct and try again. ',
-    'PORT_RESET': '\n Portfolio holdings have been reset! \n'
+    'PORT_RESET': '\n Portfolio holdings have been reset! \n',
+    'SUMMARY_1': 'With a confidence level of X%, the simulation has generated the following statistics:\n',
+    'SUMMARY_2': 'Value-at-Risk: V \nExpected Shortfall: E',
+    'EXIT_PROMPT' : 'Thank you so much for using the Portfolio Stress Tester! :D \nSee you next time!'
 }

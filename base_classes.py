@@ -82,6 +82,9 @@ class Portfolio():
         self._specs = (self._mu,
                        self._sd)
 
+    def set_value(self, value: int):
+        self._value = value
+    
     def reset_holdings(self):
         self._holdings.drop(self._holdings.index, inplace=True) 
     
@@ -149,3 +152,9 @@ class Simulation():
         
         self._conftail = self._gains[:round((1-self._conf)*self._n_sim)] 
         self._var, self._es = self._conftail[-1], np.average(self._conftail)
+    
+    def get_summary(self):
+        return [self._var, self._es]
+
+    def get_conf(self):
+        return self._conf
