@@ -166,7 +166,7 @@ class StressTester():
  
         while self._model.check_execute():
 
-            self._model.set_mode(self._view.welcome())    # may need to change this, won't need title welcome if redoing
+            self._model.set_mode(self._view.welcome())
             self._view.execute_mode_open()
 
             if self._model.get_mode() == 1:
