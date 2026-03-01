@@ -86,27 +86,24 @@ class StressView():
         self._prompts = PROMPT_MESSAGES
         self._mode_desc = MODE_NAMES
 
-    def welcome(self):
+    def execute_welcome(self):
         
         for message in list(self._messages.values())[:3]:
             print(message)
 
-        self._viewmode = int(input(self._prompts['MODE_PROMPT']))
-
-        return self._viewmode
-    
-    def execute_mode_open(self):
+    def execute_mode_prompt(self):
         
-        print(f'\nYou have chosen: ({self._viewmode}) {self._mode_desc[self._viewmode]} \n') 
-        print(f'** {self._mode_desc[self._viewmode]} ** \n') #perhaps put these into constants strings collection
-        print(f'Thank you for choosing the {self._mode_desc[self._viewmode]}! :D')
+        return int(input(self._prompts['MODE_PROMPT']))
+    
+    def execute_mode_open(self, mode: int):
+        
+        print(self._messages['MODE_OPEN_MESSAGE'].replace('@', str(mode))
+              .replace('mode_name', self._mode_desc[mode]))
 
-        print('\nCommands:')
-
-        if self._viewmode == 1:
+        if mode == 1:
             print(self._messages['MODE1_CMDS'])
         
-        elif self._viewmode == 2:
+        elif mode == 2:
             print(self._messages['MODE2_CMDS'])
     
     def mode_1_prompt(self, hold_no: int):
@@ -164,10 +161,12 @@ class StressTester():
 
     def execute(self):
  
+        self._view.execute_welcome()
+
         while self._model.check_execute():
 
-            self._model.set_mode(self._view.welcome())
-            self._view.execute_mode_open()
+            self._model.set_mode(self._view.execute_mode_prompt())
+            self._view.execute_mode_open(self._model.get_mode())
 
             if self._model.get_mode() == 1:
 

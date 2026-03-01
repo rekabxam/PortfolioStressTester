@@ -19,6 +19,7 @@ VIEW_MESSAGES = {
     'TITLE': '** Portfolio Stress Tester | Developed by Max Baker **',
     'WELCOME_MESSAGE1': '\nWelcome to the Portfolio Stress Tester! \nThis program is currently undergoing development.',
     'WELCOME_MESSAGE2': f'\nThis program currently supports 2 modes: \n (1) Custom Portfolio Builder: Build your own portfolio from scratch. \n (2) Portfolio CSV Importer: Import an existing portfolio with a formatted excel file.',
+    'MODE_OPEN_MESSAGE': '\nYou have chosen: (@) mode_name\n\n** mode_name **\n\nThank you for choosing the mode_name! :D\n\nCommands:',
     'MODE1_CMDS': (' C: See current holdings \n D: Finish custom portfolio building ') + 
     ('\n R: Reset current portfolio \n H: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'NOTHING HERE YET',
