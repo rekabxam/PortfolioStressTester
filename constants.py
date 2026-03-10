@@ -15,6 +15,17 @@ PROMPT_MESSAGES = {
     'REPEAT_PROMPT': 'Would you like to evaluate another portfolio? (Y/N) '
 }
 
+VALID_COMMANDS = {
+    'MODE_PROMPT': ['1','2'],
+    'CB_PROMPT' : '',
+    'PORT_VAL_PROMPT': '',
+    'NSTEP_PROMPT': '',
+    'NSIM_PROMPT': '',
+    'CONF_PROMPT': '',
+    'GRAPH_PROMPT' : '',
+    'REPEAT_PROMPT': ['Y', 'N']
+}
+
 VIEW_MESSAGES = {
     'TITLE': '** Portfolio Stress Tester | Developed by Max Baker **',
     'WELCOME_MESSAGE1': '\nWelcome to the Portfolio Stress Tester! \nThis program is currently undergoing development.',
@@ -23,9 +34,11 @@ VIEW_MESSAGES = {
     'MODE1_CMDS': (' C: See current holdings \n D: Finish custom portfolio building ') + 
     ('\n R: Reset current portfolio \n H: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'NOTHING HERE YET',
-    'ERR_ADDING': 'An error was encountered while adding this holding. Please check ticker is correct and try again. ',
+    'PROMPT_ERROR': 'The input you entered could not be recognised. Please enter again.',
     'PORT_RESET': '\n Portfolio holdings have been reset! \n',
     'SUMMARY_1': 'With a confidence level of X%, the simulation has generated the following statistics:\n',
     'SUMMARY_2': 'Value-at-Risk: V \nExpected Shortfall: E',
-    'EXIT_PROMPT' : 'Thank you so much for using the Portfolio Stress Tester! :D \nSee you next time!'
+    'SIM_GENERATING': '\n Generating simulation. Please wait a moment...',
+    'EXIT_PROMPT': 'Thank you so much for using the Portfolio Stress Tester! :D \nSee you next time!',
+    'ERROR_MSG': '\nERROR: The input you entered was invalid. Please enter again.'
 }
