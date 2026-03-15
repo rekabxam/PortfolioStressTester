@@ -6,10 +6,9 @@ import yfinance as yf
 
 class Holding():
     
-    def __init__(self, ticker:  str, type: str, wgt: int):
+    def __init__(self, ticker:  str, exch: str, wgt: int):
 
-        self._tkr = yf.Ticker(ticker)
-        self._type = type
+        self._tkr = yf.Ticker(f'{ticker}.{exch}')
         self._wgt = wgt
         self._hist = self._tkr.history('max')
     
@@ -37,13 +36,13 @@ class Portfolio():
     def __init__(self, value: int):
 
         self._value = value
-        self._holdings = pd.DataFrame(data=[], columns=['Symbol', 'Category', 'Weighting'])
+        self._holdings = pd.DataFrame(data=[], columns=['Symbol', 'Exchange', 'Weighting'])
         self._holdings_added = 0
     
     def add_holding(self, info: list[str]):
 
         self._holdings = pd.concat([self._holdings, pd.DataFrame(data=[info], 
-                                   columns=['Symbol', 'Category', 'Weighting'],
+                                   columns=['Symbol', 'Exchange', 'Weighting'],
                                    index=[self._holdings_added])])
         self._holdings.reindex(index=range(len(self._holdings)))
         self._holdings_added += 1
@@ -51,7 +50,7 @@ class Portfolio():
     def get_hist_dates(self):
         
         for _ in self._holdings.index:
-            self._dummy = Holding(*(self._holdings.loc[_,['Symbol', 'Category', 'Weighting']]))
+            self._dummy = Holding(*(self._holdings.loc[_,['Symbol', 'Exchange', 'Weighting']]))
 
             if _ == 0:
                 self._min_date = self._dummy.get_min_date()
@@ -69,7 +68,7 @@ class Portfolio():
 
         for _ in self._holdings.index:
              
-            self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Category', 'Weighting']])
+            self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Exchange', 'Weighting']])
 
             for i,r in enumerate(
                 self._holding.calc_returns().loc[self._min_date:]):

@@ -8,34 +8,24 @@ class StressModel():
         self._execute = True
         self._mode = None
         self._portfolio = Portfolio(0)
-        self._cmd = None
 
     def set_mode(self, mode_input):
         
         self._mode = int(mode_input)
 
-    def check_cmd(self, input): # method of checking correct holding needs work
+    def check_cb_input(self, input: str):
 
-        self._cmd = input
-
-        if self._cmd == 'C':
+        if input == 'C':
              return self._portfolio.get_holdings()
         
-        elif self._cmd == 'R': 
+        elif input == 'R': 
             self._portfolio.reset_holdings()
 
-        elif self._cmd == 'H': 
+        elif input in ['H', 'D']: 
             return
 
-        else: 
-
-            try:
-                Holding(*tuple(self._cmd.split('-'))) 
-            
-            except:
-                return 'Error Occurred'    
-                
-            self._portfolio.add_holding(tuple(self._cmd.split('-')))
+        else:         
+            self._portfolio.add_holding(input.split(HOLD_SEPERATOR))
 
     def read_sim_prompts(self, sim_specs: list):
         
@@ -53,7 +43,7 @@ class StressModel():
     
     def generate_sim_summary(self):
 
-        self._sim.gen_sim()
+        self._sim.gen_summary()
 
         return self._sim.get_summary()
     
@@ -63,19 +53,20 @@ class StressModel():
             self._execute = False
     
     def check_execute(self):
+        
         return self._execute
     
     def get_sim(self):
+        
         return self._sim
     
     def get_mode(self):
+        
         return self._mode
     
     def get_hold_no(self):
+        
         return str(self._portfolio.get_hold_no() + 1)
-
-    def get_cmd(self):
-        return self._cmd
 
 class StressView():
 
@@ -100,7 +91,7 @@ class StressView():
     
     def sim_prompts(self):
         
-        return list(self._prompts.keys())[2:-1] # add generating sim message somewhere
+        return list(self._prompts.values())[2:-1]
     
     def reprompt(self):
 
@@ -117,15 +108,19 @@ class StressView():
         elif mode == 2:
             print(self._messages['MODE2_CMDS'])
     
-    def mode_1_receive(self, model_msg, cmd: str):
+    def cb_prompt_response(self, input: str, model_ret): 
 
-        if cmd == 'C':
-            print(model_msg)
-        
-        elif cmd == 'R':
+        if input == 'C':
+
+            print('\nCurrent Portfolio: \n')
+
+            for _ in model_ret.index:
+                print(f'({_}): {model_ret['Symbol'].loc[_]}.{model_ret['Exchange'].loc[_]} ({model_ret['Weighting'].loc[_]}%)')            
+
+        elif input == 'R':
             print(self._messages['PORT_RESET'])
 
-        elif cmd == 'H':
+        elif input == 'H':
             print(self._messages['MODE1_CMDS'])
 
         else:
@@ -133,7 +128,7 @@ class StressView():
     
     def generating_sim_msg(self):
 
-        return self._messages['SIM_GENERATING']
+        print(self._messages['SIM_GENERATING'])
 
     def show_gen_summary(self, conf: int, sum_stats: tuple):
 
@@ -143,7 +138,7 @@ class StressView():
     
     def execute_exit_msg(self):
 
-        print(self._messages['EXIT_PROMPT'])
+        print(self._messages['EXIT_MSG'])
     
     def get_err_msg(self):
         
@@ -158,13 +153,42 @@ class StressTester():
         self._valid_cmds = VALID_COMMANDS
 
     def receive_input(self, prompt_text, prompt_id):
-        
-        self._input = input(prompt_text)
+    
+        self._pass = False
+        self._count = 0
 
-        while self._input not in self._valid_cmds[prompt_id]:
-        
-            print(self._view.get_err_msg())
-            self._input = input(prompt_text)
+        while not self._pass:
+
+            if self._count > 0:
+                print(self._view.get_err_msg())
+
+            self._count += 1
+
+            self._input = input(prompt_text).upper()
+
+            if (prompt_id == 'CB_PROMPT') and (HOLD_SEPERATOR in self._input): 
+
+                try: 
+                    self._dummy = Holding(
+                        *tuple(self._input.upper().split(HOLD_SEPERATOR)))
+                except:
+                    pass
+
+                self._pass = True
+
+            elif prompt_id in ['PORT_VAL_PROMPT', 'NSTEP_PROMPT',
+                               'NSIM_PROMPT', 'CONF_PROMPT']: 
+                
+                try:
+                    self._input = int(self._input)
+                except:
+                    pass
+
+                self._pass = (self._input >= self._valid_cmds[prompt_id][0])
+
+            else: 
+
+                self._pass = (self._input in self._valid_cmds[prompt_id])
         
         return self._input
     
@@ -174,9 +198,9 @@ class StressTester():
 
         for i,_ in enumerate(prompts):
             self._sim_list.append(self.receive_input(_, 
-                                                     self._valid_cmds.keys()[3+i]))
+                                                     list(self._valid_cmds.keys())[2+i]))
 
-        return tuple(self._sim_list)
+        return self._sim_list
 
     def execute(self):
  
@@ -192,15 +216,17 @@ class StressTester():
 
             if self._model.get_mode() == 1:
 
-                while self._model.get_cmd() != 'D':
-                    
-                    self._view.mode_1_receive(
-                            self._model.check_cmd(
-                                self.receive_input(
-                                    self._view.hld_enter_prompt(
-                                        self._model.get_hold_no()), 'CB_PROMPT')))
-            
-            elif self._model.get_mode() == 2:
+                self._curr_input = None
+
+                while self._curr_input != 'D':
+
+                    self._curr_input = self.receive_input(
+                        self._view.hld_enter_prompt(self._model.get_hold_no()), 'CB_PROMPT')
+
+                    self._view.cb_prompt_response(self._curr_input, 
+                                                  self._model.check_cb_input(self._curr_input))
+                                               
+            elif self._model.get_mode() == 2: # not yet in development
                 pass
 
             self._model.read_sim_prompts(
