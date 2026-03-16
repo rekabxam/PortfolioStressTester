@@ -10,19 +10,12 @@ class Holding():
 
         self._tkr = yf.Ticker(f'{ticker}.{exch}')
         self._wgt = wgt
-        self._hist = self._tkr.history('max')
+        self._hist = self._tkr.history('10y')
     
     def calc_returns(self):
         
-        self._hist['Return'] = pd.NA
+        self._hist['Return'] = self._hist['Close'].pct_change().round(3)/100
 
-        for _, d in enumerate(self._hist.index):
-            if _ == 0:
-                pass
-            self._hist.loc[d, 'Return'] = round((self._hist['Close'].iloc[_]
-                                                  - self._hist['Close'].iloc[_-1])
-                                                  /self._hist['Close'].iloc[_-1], 3)
-        
         return self._hist['Return']
     
     def get_min_date(self):
@@ -63,9 +56,10 @@ class Portfolio():
     def calculate_specs(self): 
         
         self.get_hist_dates()
+        
         self._returns = pd.DataFrame({"Date": self._dates, 
                                      "Return": [np.float64(0) for _ in range(len(self._dates))]}).set_index("Date")
-
+        
         for _ in self._holdings.index:
              
             self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Exchange', 'Weighting']])
@@ -73,10 +67,10 @@ class Portfolio():
             for i,r in enumerate(
                 self._holding.calc_returns().loc[self._min_date:]):
 
-                self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r 
+                self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r
 
-        self._mu = (1+np.mean(self._returns['Return']))**252 - 1
-        self._sd = (np.std(self._returns['Return']) * 252**0.5)
+        self._mu = round((1+np.mean(self._returns['Return']))**252 - 1, 3)
+        self._sd = round((np.std(self._returns['Return']) * 252**0.5), 3)
 
         self._specs = (self._mu,
                        self._sd)
@@ -85,7 +79,8 @@ class Portfolio():
         self._value = value
     
     def reset_holdings(self):
-        self._holdings.drop(self._holdings.index, inplace=True) 
+        self._holdings.drop(self._holdings.index, inplace=True)
+        self._holdings_added = 0 
     
     def get_specs(self):        
         return self._specs
@@ -110,7 +105,7 @@ class Simulation():
         self._gen_plot = gen_plot
         self._port.calculate_specs()
  
-    def calc_sim_price(self, price: float): #could use adjustment later
+    def calc_sim_price(self, price: float): 
 
         return round(price * (1 + 
                         ((self._port.get_specs()[0] * 252**-0.5) +
@@ -148,12 +143,11 @@ class Simulation():
 
         if self._gen_plot:
             plt.show()
-        
-        self._conftail = self._gains[:round((1-self._conf)*self._n_sim)] 
-        self._var, self._es = self._conftail[-1], np.average(self._conftail)
-    
-    def get_summary(self):
-        return [self._var, self._es]
 
+        self._conftail = self._gains[:round((1-self._conf)*self._n_sim)+1] 
+        self._var, self._es = round(self._conftail[-1], 3), round(np.average(self._conftail), 3)
+
+        return [self._var, self._es]
+    
     def get_conf(self):
         return self._conf

@@ -8,7 +8,7 @@ MODE_NAMES = {
 PROMPT_MESSAGES = {
     'MODE_PROMPT': '\nPlease enter the method by which you wish to evaluate your portfolio (1/2): ',
     'CB_PROMPT' : 'Please enter Portfolio Holding @. Alternatively, enter a valid command: ',
-    'PORT_VAL_PROMPT': 'Please enter the value of the entered portfolio: ',
+    'PORT_VAL_PROMPT': '\nPlease enter the value of the entered portfolio: ',
     'NSTEP_PROMPT': 'Please enter how many steps you would like to simulate for your portfolio: ',
     'NSIM_PROMPT': 'Please enter how many simulations you would like to generate: ',
     'CONF_PROMPT': 'Please enter the confidence level (%) for which you are stress testing: ',
@@ -36,9 +36,9 @@ VIEW_MESSAGES = {
     ('\n R/r: Reset current portfolio \n H/h: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'NOTHING HERE YET',
     'PROMPT_ERROR': 'The input you entered could not be recognised. Please enter again.',
-    'PORT_RESET': 'Portfolio holdings have been reset! \n',
+    'PORT_RESET': '\nPortfolio holdings have been reset! \n',
     'SUMMARY_1': 'With a confidence level of X%, the simulation has generated the following statistics:\n',
-    'SUMMARY_2': 'Value-at-Risk: V \nExpected Shortfall: E',
+    'SUMMARY_2': 'Value-at-Risk: @v \nExpected Shortfall: @e',
     'SIM_GENERATING': '\nGenerating simulation. Please wait a moment...',
     'EXIT_MSG': 'Thank you so much for using the Portfolio Stress Tester! :D \nSee you next time!',
     'ERROR_MSG': 'ERROR: The input you entered was invalid. Please enter again.'

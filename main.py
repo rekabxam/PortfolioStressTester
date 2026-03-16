@@ -43,9 +43,7 @@ class StressModel():
     
     def generate_sim_summary(self):
 
-        self._sim.gen_summary()
-
-        return self._sim.get_summary()
+        return self._sim.gen_summary()
     
     def set_execute(self, exec_input: str):
 
@@ -134,7 +132,7 @@ class StressView():
 
         print(self._messages['SUMMARY_1'].replace('X', str(conf)))
         print(self._messages['SUMMARY_2'].replace(
-            'V', str(sum_stats[0])).replace('E', str(sum_stats[1])))
+            '@v', str(sum_stats[0])).replace('@e', str(sum_stats[1])))
     
     def execute_exit_msg(self):
 
@@ -235,12 +233,12 @@ class StressTester():
             
             self._view.generating_sim_msg()
 
-            self._view.show_gen_summary(self._model.get_sim().get_conf(),
+            self._view.show_gen_summary(self._model.get_sim().get_conf()*100,
                                         self._model.generate_sim_summary())
             
             self._model.set_execute(
                 self.receive_input(
-                    self._view.reprompt()))
+                    self._view.reprompt(), 'REPEAT_PROMPT'))
         
         self._view.execute_exit_msg()
     
