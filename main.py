@@ -65,6 +65,10 @@ class StressModel():
     def get_hold_no(self):
         
         return str(self._portfolio.get_hold_no() + 1)
+    
+    def reset_portfolio_holdings(self):
+
+        self._portfolio.reset_holdings()
 
 class StressView():
 
@@ -110,11 +114,16 @@ class StressView():
 
         if input == 'C':
 
-            print('\nCurrent Portfolio: \n')
+            if not model_ret.empty:
+                
+                print('\nCurrent Portfolio: \n')
 
-            for _ in model_ret.index:
-                print(f'({_}): {model_ret['Symbol'].loc[_]}.{model_ret['Exchange'].loc[_]} ({model_ret['Weighting'].loc[_]}%)')            
-
+                for _ in model_ret.index:
+                    print(f'({_}): {model_ret['Symbol'].loc[_]}.{model_ret['Exchange'].loc[_]} ({model_ret['Weighting'].loc[_]}%)')            
+    
+            else:
+                print(self._messages['EMPTY_PORT'])
+            
         elif input == 'R':
             print(self._messages['PORT_RESET'])
 
@@ -224,7 +233,7 @@ class StressTester():
                     self._view.cb_prompt_response(self._curr_input, 
                                                   self._model.check_cb_input(self._curr_input))
                                                
-            elif self._model.get_mode() == 2: # not yet in development
+            elif self._model.get_mode() == 2: 
                 pass
 
             self._model.read_sim_prompts(
@@ -235,10 +244,12 @@ class StressTester():
 
             self._view.show_gen_summary(self._model.get_sim().get_conf()*100,
                                         self._model.generate_sim_summary())
-            
+
             self._model.set_execute(
                 self.receive_input(
                     self._view.reprompt(), 'REPEAT_PROMPT'))
+            
+            self._model.reset_portfolio_holdings()
         
         self._view.execute_exit_msg()
     

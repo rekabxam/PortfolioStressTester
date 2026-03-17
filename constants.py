@@ -35,7 +35,7 @@ VIEW_MESSAGES = {
     'MODE1_CMDS': (f' TKR{HOLD_SEPERATOR}EXCH{HOLD_SEPERATOR}WGT: Add holding into portfolio \n C/c: See current holdings \n D/d: Finish custom portfolio building ') + 
     ('\n R/r: Reset current portfolio \n H/h: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'NOTHING HERE YET',
-    'PROMPT_ERROR': 'The input you entered could not be recognised. Please enter again.',
+    'EMPTY_PORT': '\nNo holdings to display! Try adding some holdings first. \n',
     'PORT_RESET': '\nPortfolio holdings have been reset! \n',
     'SUMMARY_1': 'With a confidence level of X%, the simulation has generated the following statistics:\n',
     'SUMMARY_2': 'Value-at-Risk: @v \nExpected Shortfall: @e',
