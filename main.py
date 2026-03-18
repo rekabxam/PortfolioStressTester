@@ -78,78 +78,80 @@ class StressView():
         self._prompts = PROMPT_MESSAGES
         self._mode_desc = MODE_NAMES
 
-    def execute_welcome(self):
-        
-        for message in list(self._messages.values())[:3]:
-            print(message)
+    def get_text(self, type_id: str, msg_id: str): 
 
-    def mode_prompt(self):
+        if type_id == 'msg':
+            return self._messages[msg_id]
         
-        return self._prompts['MODE_PROMPT']
+        elif type_id == 'prompt':
+            return self._prompts[msg_id]
     
-    def hld_enter_prompt(self, hold_no: int):
+    def output_text(self, text: str, pholder: str, new: str, output: bool):
 
-        return self._prompts['CB_PROMPT'].replace('@', hold_no)
-    
-    def sim_prompts(self):
-        
-        return list(self._prompts.values())[2:-1]
-    
-    def reprompt(self):
+        if output:
+            print(text.replace(pholder, new))
 
-        return self._prompts['REPEAT_PROMPT']
-    
-    def execute_mode_open(self, mode: int):
+        return text.replace(pholder, new)
+
+    def output_mode_open(self, mode: int):
         
-        print(self._messages['MODE_OPEN_MESSAGE'].replace('@', str(mode))
-              .replace('mode_name', self._mode_desc[mode]))
+        self.output_text(
+            self.get_text('msg', 'MODE_OPEN_MESSAGE'), 'mode_name', self._mode_desc[mode], True)
 
         if mode == 1:
-            print(self._messages['MODE1_CMDS'])
+            self.output_text(
+                self.get_text('msg', 'MODE1_CMDS'), *('','',True))
         
         elif mode == 2:
-            print(self._messages['MODE2_CMDS'])
+            self.output_text(
+                self.get_text('msg', 'MODE2_CMDS'), *('','',True))
     
     def cb_prompt_response(self, input: str, model_ret): 
 
         if input == 'C':
 
-            if not model_ret.empty:
+            if not model_ret.empty: 
                 
-                print('\nCurrent Portfolio: \n')
-
+                self.output_text(
+                    self.get_text('msg', 'CURRENT_PORTFOLIO'), *('','',True))
+        
                 for _ in model_ret.index:
-                    print(f'({_}): {model_ret['Symbol'].loc[_]}.{model_ret['Exchange'].loc[_]} ({model_ret['Weighting'].loc[_]}%)')            
+                    
+                    self._entry = ((self.output_text(
+                        self.get_text('msg', 'MODEL_SYMBOL'), *('@',model_ret['Symbol'].loc[_],False))) 
+                    + (self.output_text(
+                        self.get_text('msg', 'MODEL_EXCH'), *('@',model_ret['Exchange'].loc[_],False)))
+                    + (self.output_text(
+                        self.get_text('msg', 'MODEL_WGT'), *('@',model_ret['Weighting'].loc[_],False))))
+
+                    self.output_text((f'({_+1}) '+ self._entry), *('','', True))
     
             else:
-                print(self._messages['EMPTY_PORT'])
-            
+                self.output_text(
+                    self.get_text('msg', 'EMPTY_PORT'), *('','',True))
+        
         elif input == 'R':
-            print(self._messages['PORT_RESET'])
-
+            self.output_text(
+                    self.get_text('msg', 'PORT_RESET'), *('','',True))
+        
         elif input == 'H':
-            print(self._messages['MODE1_CMDS'])
-
+            self.output_text(
+                    self.get_text('msg', 'MODE1_CMDS'), *('','',True))
+        
         else:
             pass
     
-    def generating_sim_msg(self):
+    def sim_prompts(self): 
 
-        print(self._messages['SIM_GENERATING'])
-
+        return [self.get_text('prompt', _) 
+                for _ in list(self._prompts.keys())[2:-1]]
+    
     def show_gen_summary(self, conf: int, sum_stats: tuple):
 
-        print(self._messages['SUMMARY_1'].replace('X', str(conf)))
-        print(self._messages['SUMMARY_2'].replace(
-            '@v', str(sum_stats[0])).replace('@e', str(sum_stats[1])))
-    
-    def execute_exit_msg(self):
+        self._entries = (conf, *(sum_stats))
 
-        print(self._messages['EXIT_MSG'])
-    
-    def get_err_msg(self):
-        
-        return self._messages['ERROR_MSG']
+        for i, _ in enumerate(['SUMMARY_1', 'SUMMARY_2', 'SUMMARY_3']):
+            self.output_text(self.get_text('msg', _),'@', str(self._entries[i]), True)
 
 class StressTester():
     
@@ -167,7 +169,8 @@ class StressTester():
         while not self._pass:
 
             if self._count > 0:
-                print(self._view.get_err_msg())
+                self._view.output_text(
+                    self._view.get_text('msg', 'ERROR_MSG'), *('', '', True))
 
             self._count += 1
 
@@ -211,15 +214,16 @@ class StressTester():
 
     def execute(self):
  
-        self._view.execute_welcome()
+        self._view.output_text(self._view.get_text('msg', 'PROGRAM_OPEN_MSG'), *('', '', True))
 
         while self._model.check_execute():
 
-            self._model.set_mode(
-                    self.receive_input(
-                        self._view.mode_prompt(), 'MODE_PROMPT'))
-            
-            self._view.execute_mode_open(self._model.get_mode())
+            self._mode_choice = self.receive_input(
+                        self._view.output_text(self._view.get_text('prompt', 'MODE_PROMPT'), *('', '', False)), 'MODE_PROMPT')
+
+            self._model.set_mode(self._mode_choice)
+
+            self._view.output_mode_open(self._model.get_mode())
 
             if self._model.get_mode() == 1:
 
@@ -228,7 +232,8 @@ class StressTester():
                 while self._curr_input != 'D':
 
                     self._curr_input = self.receive_input(
-                        self._view.hld_enter_prompt(self._model.get_hold_no()), 'CB_PROMPT')
+                        self._view.output_text(self._view.get_text('prompt', 'CB_PROMPT'), *('@', self._model.get_hold_no(), False)),
+                        'CB_PROMPT')
 
                     self._view.cb_prompt_response(self._curr_input, 
                                                   self._model.check_cb_input(self._curr_input))
@@ -240,18 +245,18 @@ class StressTester():
                 self.build_sim_input(
                     self._view.sim_prompts()))
             
-            self._view.generating_sim_msg()
+            self._view.output_text(self._view.get_text('msg', 'SIM_GENERATING'), *('', '', True))
 
             self._view.show_gen_summary(self._model.get_sim().get_conf()*100,
                                         self._model.generate_sim_summary())
 
             self._model.set_execute(
                 self.receive_input(
-                    self._view.reprompt(), 'REPEAT_PROMPT'))
+                    self._view.output_text(self._view.get_text('prompt', 'REPEAT_PROMPT'), *('', '', False)), 'REPEAT_PROMPT'))
             
             self._model.reset_portfolio_holdings()
         
-        self._view.execute_exit_msg()
+        self._view.output_text(self._view.get_text('msg', 'EXIT_MSG'), *('', '', True))
     
 def main():   
     controller = StressTester()
