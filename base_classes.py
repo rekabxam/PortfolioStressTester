@@ -3,14 +3,18 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
+import os
+
+import warnings
+warnings.filterwarnings('ignore')
 
 class Holding():
     
-    def __init__(self, ticker:  str, exch: str, wgt: int):
+    def __init__(self, ticker:  str, exch: str, wgt: str):
 
         self._tkr = yf.Ticker(f'{ticker}.{exch}')
-        self._wgt = wgt
-        self._hist = self._tkr.history('10y')
+        self._wgt = int(wgt)
+        self._hist = self._tkr.history('max')
     
     def calc_returns(self):
         
@@ -39,6 +43,15 @@ class Portfolio():
                                    index=[self._holdings_added])])
         self._holdings.reindex(index=range(len(self._holdings)))
         self._holdings_added += 1
+
+    def read_xlsx(self, file_name: str):
+
+        self._read = pd.read_excel(f'{os.getcwd()}/Load Files/{file_name}.xlsx')
+
+        for _ in self._read.index: 
+            self._read.loc[_, 'Weighting'] = str(self._read['Weighting'].loc[_])
+
+        self._holdings = self._read.copy()
     
     def get_hist_dates(self):
         
@@ -107,7 +120,7 @@ class Simulation():
  
     def calc_sim_price(self, price: float): 
 
-        return round(price * (1 + 
+        return round(price * np.exp( 
                         ((self._port.get_specs()[0] * 252**-0.5) +
                         (self._port.get_specs()[1] * 252**-0.5 * 
                          np.random.standard_normal(1)))),3)

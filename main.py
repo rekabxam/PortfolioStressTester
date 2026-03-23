@@ -26,6 +26,12 @@ class StressModel():
 
         else:         
             self._portfolio.add_holding(input.split(HOLD_SEPERATOR))
+    
+    def read_xlsx_name(self, file_name: str):
+
+        self._portfolio.read_xlsx(file_name)
+
+        return self._portfolio.get_holdings()
 
     def read_sim_prompts(self, sim_specs: list):
         
@@ -106,17 +112,13 @@ class StressView():
             self.output_text(
                 self.get_text('msg', 'MODE2_CMDS'), *('','',True))
     
-    def cb_prompt_response(self, input: str, model_ret): 
+    def format_current_portfolio(self, model_ret):
 
-        if input == 'C':
-
-            if not model_ret.empty: 
-                
-                self.output_text(
+        self.output_text(
                     self.get_text('msg', 'CURRENT_PORTFOLIO'), *('','',True))
         
-                for _ in model_ret.index:
-                    
+        for _ in model_ret.index:
+
                     self._entry = ((self.output_text(
                         self.get_text('msg', 'MODEL_SYMBOL'), *('@',model_ret['Symbol'].loc[_],False))) 
                     + (self.output_text(
@@ -124,8 +126,18 @@ class StressView():
                     + (self.output_text(
                         self.get_text('msg', 'MODEL_WGT'), *('@',model_ret['Weighting'].loc[_],False))))
 
-                    self.output_text((f'({_+1}) '+ self._entry), *('','', True))
+                    self._end = ' \n' if _ == max(list(model_ret.index)) else ''
+
+                    self.output_text((f'({_+1}) '+ self._entry + self._end), *('','', True))
     
+    def cb_prompt_response(self, input: str, model_ret): 
+
+        if input == 'C':
+
+            if not model_ret.empty: 
+        
+                self.format_current_portfolio(model_ret)
+
             else:
                 self.output_text(
                     self.get_text('msg', 'EMPTY_PORT'), *('','',True))
@@ -140,11 +152,15 @@ class StressView():
         
         else:
             pass
-    
+
+    def pi_prompt_response(self, model_ret):
+        
+        self.format_current_portfolio(model_ret)
+
     def sim_prompts(self): 
 
         return [self.get_text('prompt', _) 
-                for _ in list(self._prompts.keys())[2:-1]]
+                for _ in list(self._prompts.keys())[4:-1]]
     
     def show_gen_summary(self, conf: int, sum_stats: tuple):
 
@@ -165,40 +181,48 @@ class StressTester():
     
         self._pass = False
         self._count = 0
+        self._prev_err = None
 
         while not self._pass:
 
             if self._count > 0:
                 self._view.output_text(
-                    self._view.get_text('msg', 'ERROR_MSG'), *('', '', True))
+                        self._view.get_text('msg', 'ERROR_MSG'), *('@', self._prev_err, True))
 
             self._count += 1
+            self._input = input(prompt_text).upper() if prompt_id == 'CB_PROMPT' else input(prompt_text)
 
-            self._input = input(prompt_text).upper()
-
-            if (prompt_id == 'CB_PROMPT') and (HOLD_SEPERATOR in self._input): 
+            if (prompt_id == 'CB_PROMPT') and (self._input.count(HOLD_SEPERATOR) == 2): 
 
                 try: 
                     self._dummy = Holding(
                         *tuple(self._input.upper().split(HOLD_SEPERATOR)))
-                except:
-                    pass
+                    self._pass = True
+                except Exception as e:
+                    self._prev_err = str(e)
+                    
+            elif prompt_id == 'PI_PROMPT':
 
-                self._pass = True
+                try:
+                    self._dummy = Portfolio(0).read_xlsx(self._input)
+                    self._pass = True
+                except Exception as e:
+                    self._prev_err = str(e)
 
             elif prompt_id in ['PORT_VAL_PROMPT', 'NSTEP_PROMPT',
                                'NSIM_PROMPT', 'CONF_PROMPT']: 
                 
                 try:
                     self._input = int(self._input)
-                except:
-                    pass
+                except Exception as e:
+                    self._prev_err = str(e)
 
                 self._pass = (self._input >= self._valid_cmds[prompt_id][0])
 
             else: 
 
-                self._pass = (self._input in self._valid_cmds[prompt_id])
+                self._pass = (self._input.upper() in self._valid_cmds[prompt_id])
+                self._prev_err = self._view.output_text(self._view.get_text('msg','NOTINLIST_ERR'), *('', '', False))
         
         return self._input
     
@@ -208,7 +232,7 @@ class StressTester():
 
         for i,_ in enumerate(prompts):
             self._sim_list.append(self.receive_input(_, 
-                                                     list(self._valid_cmds.keys())[2+i]))
+                                                     list(self._valid_cmds.keys())[4+i]))
 
         return self._sim_list
 
@@ -224,10 +248,9 @@ class StressTester():
             self._model.set_mode(self._mode_choice)
 
             self._view.output_mode_open(self._model.get_mode())
+            self._curr_input = None
 
             if self._model.get_mode() == 1:
-
-                self._curr_input = None
 
                 while self._curr_input != 'D':
 
@@ -239,11 +262,22 @@ class StressTester():
                                                   self._model.check_cb_input(self._curr_input))
                                                
             elif self._model.get_mode() == 2: 
-                pass
+
+                while self._curr_input != 'Y':
+                
+                    self._curr_input = self.receive_input(
+                        self._view.output_text(self._view.get_text('prompt', 'PI_PROMPT'), *('', '', False)),
+                            'PI_PROMPT') 
+                    
+                    self._view.pi_prompt_response(self._model.read_xlsx_name(self._curr_input))
+
+                    self._curr_input = self.receive_input(
+                        self._view.output_text(self._view.get_text('prompt', 'PI_CONFIRM'), *('', '', False)),
+                            'PI_CONFIRM')
 
             self._model.read_sim_prompts(
                 self.build_sim_input(
-                    self._view.sim_prompts()))
+                    self._view.sim_prompts())) 
             
             self._view.output_text(self._view.get_text('msg', 'SIM_GENERATING'), *('', '', True))
 
