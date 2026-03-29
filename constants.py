@@ -10,7 +10,7 @@ PROMPT_MESSAGES = {
     'CB_PROMPT' : 'Please enter Portfolio Holding @. Alternatively, enter a valid command: ',
     'PI_PROMPT': 'Please enter the name of your saved portfolio holdings file (without .xlsx): ',
     'PI_CONFIRM': 'Please confirm that the holdings of your imported portfolio are entered correctly (Y/N): ',
-    'PORT_VAL_PROMPT': 'Please enter the value of the entered portfolio: ',
+    'PORT_VAL_PROMPT': '\nPlease enter the value of the entered portfolio: ',
     'NSTEP_PROMPT': 'Please enter how many steps you would like to simulate for your portfolio: ',
     'NSIM_PROMPT': 'Please enter how many simulations you would like to generate: ',
     'CONF_PROMPT': 'Please enter the confidence level (%) for which you are stress testing: ',
@@ -26,7 +26,7 @@ VALID_COMMANDS = {
     'PORT_VAL_PROMPT': [0],
     'NSTEP_PROMPT': [0],
     'NSIM_PROMPT': [0],
-    'CONF_PROMPT': [0],
+    'CONF_PROMPT': [0,100],
     'GRAPH_PROMPT' : ['Y', 'N'],
     'REPEAT_PROMPT': ['Y', 'N']
 }
@@ -38,10 +38,11 @@ VIEW_MESSAGES = {
     '\n (1) Custom Portfolio Builder: Build your own portfolio from scratch.' +
     '\n (2) Portfolio CSV Importer: Import an existing portfolio with a formatted excel file.',
     'MODE_OPEN_MESSAGE': '\nYou have chosen: mode_name\n\n** mode_name **\n\nThank you for choosing the mode_name! :D\n\nCommands:',
-    'MODE1_CMDS': (f'\nTKR{HOLD_SEPERATOR}EXCH{HOLD_SEPERATOR}WGT: Add holding into portfolio \n C/c: See current holdings \n D/d: Finish custom portfolio building ') + 
+    'MODE1_CMDS': (f'\n TKR{HOLD_SEPERATOR}EXCH{HOLD_SEPERATOR}WGT: Add holding into portfolio \n C/c: See current holdings \n D/d: Finish custom portfolio building ') + 
     ('\n R/r: Reset current portfolio \n H/h: Help on commands and mode usage \n'),
     'MODE2_CMDS': 'Before continuing, please save a .xlsx file containing your holdings represented in the template found in template.xlsx.',
     'CURRENT_PORTFOLIO': '\nCurrent Portfolio:\n',
+    'CURRENT_WGT': 'Current Total Weight: @%\n',
     'MODEL_SYMBOL': '@.', 
     'MODEL_EXCH': '@',
     'MODEL_WGT': ' (@%)',

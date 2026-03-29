@@ -12,7 +12,7 @@ class Holding():
     
     def __init__(self, ticker:  str, exch: str, wgt: str):
 
-        self._tkr = yf.Ticker(f'{ticker}.{exch}')
+        self._rep, self._tkr = f'{ticker}.{exch}', yf.Ticker(f'{ticker}.{exch}')
         self._wgt = int(wgt)
         self._hist = self._tkr.history('max')
     
@@ -27,6 +27,9 @@ class Holding():
 
     def get_weighting(self):
         return self._wgt
+    
+    def get_repr(self):
+        return self._rep
 
 class Portfolio():
 

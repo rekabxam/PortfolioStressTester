@@ -47,6 +47,10 @@ class StressModel():
     
         self._sim = Simulation(self._portfolio, *self._sim_specs)
     
+    def get_portfolio(self):
+
+        return self._portfolio
+    
     def generate_sim_summary(self):
 
         return self._sim.gen_summary()
@@ -129,6 +133,8 @@ class StressView():
                     self._end = ' \n' if _ == max(list(model_ret.index)) else ''
 
                     self.output_text((f'({_+1}) '+ self._entry + self._end), *('','', True))
+            
+        self.output_text(self.get_text('msg', 'CURRENT_WGT'), *('@', str(sum([int(_) for _ in model_ret['Weighting']])),True))
     
     def cb_prompt_response(self, input: str, model_ret): 
 
@@ -195,9 +201,21 @@ class StressTester():
             if (prompt_id == 'CB_PROMPT') and (self._input.count(HOLD_SEPERATOR) == 2): 
 
                 try: 
+
                     self._dummy = Holding(
                         *tuple(self._input.upper().split(HOLD_SEPERATOR)))
-                    self._pass = True
+                
+                    self._c = self._model.get_portfolio().get_holdings()
+                
+                    self._curr_holds = [f'{self._c.loc[_,'Symbol']}.{self._c.loc[_,'Exchange']}' for _ 
+                                        in self._c.index]
+
+
+                    if self._dummy.get_repr() in self._curr_holds:
+                        raise Exception
+                    
+                    self._pass = True 
+                
                 except Exception as e:
                     self._prev_err = str(e)
                     
@@ -214,10 +232,18 @@ class StressTester():
                 
                 try:
                     self._input = int(self._input)
+                    
+                    self._cond1 = (self._input >= (self._valid_cmds[prompt_id][0]))
+                    self._cond2 = ((self._input <= (self._valid_cmds[prompt_id][-1]) if prompt_id == 'CONF_PROMPT'
+                                    else True))
+
+                    if not (self._cond1 and self._cond2):
+                        raise Exception
+
                 except Exception as e:
                     self._prev_err = str(e)
 
-                self._pass = (self._input >= self._valid_cmds[prompt_id][0])
+                self._pass = (self._cond1 and self._cond2)
 
             else: 
 
@@ -277,8 +303,8 @@ class StressTester():
 
             self._model.read_sim_prompts(
                 self.build_sim_input(
-                    self._view.sim_prompts())) 
-            
+                    self._view.sim_prompts()))
+
             self._view.output_text(self._view.get_text('msg', 'SIM_GENERATING'), *('', '', True))
 
             self._view.show_gen_summary(self._model.get_sim().get_conf()*100,
