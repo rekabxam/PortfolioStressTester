@@ -3,27 +3,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import yfinance as yf
+import os
+
+import warnings
+warnings.filterwarnings('ignore')
 
 class Holding():
     
-    def __init__(self, ticker:  str, type: str, wgt: int):
+    def __init__(self, ticker:  str, exch: str, wgt: str):
 
-        self._tkr = yf.Ticker(ticker)
-        self._type = type
-        self._wgt = wgt
+        self._rep, self._tkr = f'{ticker}.{exch}', yf.Ticker(f'{ticker}.{exch}')
+        self._wgt = int(wgt)
         self._hist = self._tkr.history('max')
     
     def calc_returns(self):
         
-        self._hist['Return'] = pd.NA
+        self._hist['Return'] = self._hist['Close'].pct_change().round(3)/100
 
-        for _, d in enumerate(self._hist.index):
-            if _ == 0:
-                pass
-            self._hist.loc[d, 'Return'] = round((self._hist['Close'].iloc[_]
-                                                  - self._hist['Close'].iloc[_-1])
-                                                  /self._hist['Close'].iloc[_-1], 3)
-        
         return self._hist['Return']
     
     def get_min_date(self):
@@ -31,27 +27,39 @@ class Holding():
 
     def get_weighting(self):
         return self._wgt
+    
+    def get_repr(self):
+        return self._rep
 
 class Portfolio():
 
     def __init__(self, value: int):
 
         self._value = value
-        self._holdings = pd.DataFrame(data=[], columns=['Symbol', 'Category', 'Weighting'])
+        self._holdings = pd.DataFrame(data=[], columns=['Symbol', 'Exchange', 'Weighting'])
         self._holdings_added = 0
     
     def add_holding(self, info: list[str]):
 
         self._holdings = pd.concat([self._holdings, pd.DataFrame(data=[info], 
-                                   columns=['Symbol', 'Category', 'Weighting'],
+                                   columns=['Symbol', 'Exchange', 'Weighting'],
                                    index=[self._holdings_added])])
         self._holdings.reindex(index=range(len(self._holdings)))
         self._holdings_added += 1
+
+    def read_xlsx(self, file_name: str):
+
+        self._read = pd.read_excel(f'{os.getcwd()}/Load Files/{file_name}.xlsx')
+
+        for _ in self._read.index: 
+            self._read.loc[_, 'Weighting'] = str(self._read['Weighting'].loc[_])
+
+        self._holdings = self._read.copy()
     
     def get_hist_dates(self):
         
         for _ in self._holdings.index:
-            self._dummy = Holding(*(self._holdings.loc[_,['Symbol', 'Category', 'Weighting']]))
+            self._dummy = Holding(*(self._holdings.loc[_,['Symbol', 'Exchange', 'Weighting']]))
 
             if _ == 0:
                 self._min_date = self._dummy.get_min_date()
@@ -64,20 +72,21 @@ class Portfolio():
     def calculate_specs(self): 
         
         self.get_hist_dates()
+        
         self._returns = pd.DataFrame({"Date": self._dates, 
                                      "Return": [np.float64(0) for _ in range(len(self._dates))]}).set_index("Date")
-
+        
         for _ in self._holdings.index:
              
-            self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Category', 'Weighting']])
+            self._holding = Holding(*self._holdings.loc[_,['Symbol', 'Exchange', 'Weighting']])
 
             for i,r in enumerate(
                 self._holding.calc_returns().loc[self._min_date:]):
 
-                self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r 
+                self._returns.iloc[i] += np.float64(self._holding.get_weighting()) * r
 
-        self._mu = (1+np.mean(self._returns['Return']))**252 - 1
-        self._sd = (np.std(self._returns['Return']) * 252**0.5)
+        self._mu = round((1+np.mean(self._returns['Return']))**252 - 1, 3)
+        self._sd = round((np.std(self._returns['Return']) * 252**0.5), 3)
 
         self._specs = (self._mu,
                        self._sd)
@@ -86,7 +95,8 @@ class Portfolio():
         self._value = value
     
     def reset_holdings(self):
-        self._holdings.drop(self._holdings.index, inplace=True) 
+        self._holdings.drop(self._holdings.index, inplace=True)
+        self._holdings_added = 0 
     
     def get_specs(self):        
         return self._specs
@@ -111,9 +121,9 @@ class Simulation():
         self._gen_plot = gen_plot
         self._port.calculate_specs()
  
-    def calc_sim_price(self, price: float): #could use adjustment later
+    def calc_sim_price(self, price: float): 
 
-        return round(price * (1 + 
+        return round(price * np.exp( 
                         ((self._port.get_specs()[0] * 252**-0.5) +
                         (self._port.get_specs()[1] * 252**-0.5 * 
                          np.random.standard_normal(1)))),3)
@@ -149,12 +159,11 @@ class Simulation():
 
         if self._gen_plot:
             plt.show()
-        
-        self._conftail = self._gains[:round((1-self._conf)*self._n_sim)] 
-        self._var, self._es = self._conftail[-1], np.average(self._conftail)
-    
-    def get_summary(self):
-        return [self._var, self._es]
 
+        self._conftail = self._gains[:round((1-self._conf)*self._n_sim)+1] 
+        self._var, self._es = round(self._conftail[-1], 3), round(np.average(self._conftail), 3)
+
+        return [self._var, self._es]
+    
     def get_conf(self):
         return self._conf
